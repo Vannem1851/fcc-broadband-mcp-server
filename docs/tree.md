@@ -1,6 +1,6 @@
 # fcc-broadband-mcp-server - Directory Structure
 
-Generated on: 2026-05-26 00:19:32
+Generated on: 2026-05-26 03:16:01
 
 ```text
 fcc-broadband-mcp-server/
@@ -104,26 +104,53 @@ fcc-broadband-mcp-server/
 │   └── tool-defs-analysis/
 │       └── SKILL.md
 ├── src/
+│   ├── config/
+│   │   └── server-config.ts
 │   ├── mcp-server/
 │   │   ├── prompts/
 │   │   │   └── definitions/
-│   │   │       └── echo.prompt.ts
+│   │   │       ├── broadband-equity-analysis.prompt.ts
+│   │   │       └── index.ts
 │   │   ├── resources/
 │   │   │   └── definitions/
-│   │   │       ├── echo-app-ui.app-resource.ts
-│   │   │       └── echo.resource.ts
+│   │   │       ├── geography-summary.resource.ts
+│   │   │       ├── index.ts
+│   │   │       └── providers-list.resource.ts
 │   │   └── tools/
 │   │       └── definitions/
-│   │           ├── echo-app.app-tool.ts
-│   │           └── echo.tool.ts
+│   │           ├── compare-areas.tool.ts
+│   │           ├── find-underserved.tool.ts
+│   │           ├── geocode-block.tool.ts
+│   │           ├── get-coverage-summary.tool.ts
+│   │           ├── get-provider.tool.ts
+│   │           ├── index.ts
+│   │           ├── list-downloads.tool.ts
+│   │           ├── list-filing-periods.tool.ts
+│   │           ├── search-availability.tool.ts
+│   │           └── search-providers.tool.ts
+│   ├── services/
+│   │   ├── bdc-api/
+│   │   │   ├── bdc-api-service.ts
+│   │   │   └── types.ts
+│   │   ├── geo-api/
+│   │   │   ├── geo-api-service.ts
+│   │   │   └── types.ts
+│   │   └── open-data/
+│   │       ├── open-data-service.ts
+│   │       └── types.ts
 │   └── index.ts
 ├── tests/
 │   ├── prompts/
-│   │   └── echo.prompt.test.ts
 │   ├── resources/
-│   │   └── echo.resource.test.ts
 │   └── tools/
-│       └── echo.tool.test.ts
+│       ├── compare-areas.tool.test.ts
+│       ├── find-underserved.tool.test.ts
+│       ├── geocode-block.tool.test.ts
+│       ├── get-coverage-summary.tool.test.ts
+│       ├── get-provider.tool.test.ts
+│       ├── list-filing-periods.tool.test.ts
+│       ├── search-availability.tool.test.ts
+│       └── search-providers.tool.test.ts
 ├── .dockerignore
 ├── .env.example
 ├── .gitignore
