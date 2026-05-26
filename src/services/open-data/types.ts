@@ -70,7 +70,7 @@ export interface RawProviderSummaryRow {
 
 /** Raw row from the geography lookup table (v5vt-e7vw). */
 export interface RawGeographyRow {
-  id?: string;
+  geoid?: string;
   name?: string;
   type?: string;
 }

@@ -358,6 +358,7 @@ export class OpenDataService {
       techFilter: string;
       speedDown: string;
       urbanRuralFilter?: 'all' | 'R' | 'U';
+      stateFipsPrefix?: string;
       limit?: number;
     },
     ctx: Context,
@@ -379,6 +380,10 @@ export class OpenDataService {
 
     if (options.urbanRuralFilter && options.urbanRuralFilter !== 'all') {
       conditions.push(`urban_rural='${options.urbanRuralFilter}'`);
+    }
+
+    if (options.stateFipsPrefix) {
+      conditions.push(`id LIKE '${options.stateFipsPrefix}%'`);
     }
 
     const maxRows = Math.min(options.limit ?? 10000, MAX_LIMIT);
@@ -410,7 +415,7 @@ export class OpenDataService {
     const conditions: string[] = [];
     if (options.nameSearch) {
       const escaped = options.nameSearch.replace(/'/g, "''");
-      conditions.push(`upper(holdingcompanyname) LIKE upper('%25${escaped}%25')`);
+      conditions.push(`upper(holdingcompanyname) LIKE upper('%${escaped}%')`);
     }
     if (options.state) {
       conditions.push(`stateabbr='${options.state}'`);
@@ -525,8 +530,8 @@ export class OpenDataService {
   async getGeographyName(type: string, id: string, ctx: Context): Promise<string | undefined> {
     const geoId = type === 'nation' ? '0' : id;
     const url = this.buildUrl(DATASET_IDS.GEOGRAPHY_LOOKUP, {
-      $where: `id='${geoId}' AND type='${type}'`,
-      $select: 'id,type,name',
+      $where: `geoid='${geoId}' AND type='${type}'`,
+      $select: 'geoid,type,name',
       $limit: 1,
     });
 
@@ -535,25 +540,25 @@ export class OpenDataService {
   }
 
   /**
-   * Lists all distinct holding companies with hoconum + name.
+   * Lists all distinct holding companies with hoconum identifiers.
+   * Queries the smaller provider_summary table (7K rows, ~0.5s) instead of the full
+   * deployment table (5M rows) which causes GROUP BY timeouts.
+   * Names are not available in provider_summary; use fcc_search_providers to look up names.
    */
-  async listAllProviders(
-    ctx: Context,
-  ): Promise<Array<{ hoconum: string; holdingCompanyName: string }>> {
-    const url = this.buildUrl(DATASET_IDS.DEPLOYMENT, {
-      $select: 'hoconum,holdingcompanyname',
-      $group: 'hoconum,holdingcompanyname',
-      $order: 'holdingcompanyname ASC',
-      $limit: DEFAULT_LIMIT,
-    });
+  async listAllProviders(ctx: Context): Promise<Array<{ hoconum: string }>> {
+    const rows = await this.fetchAllPages<RawProviderSummaryRow>(
+      DATASET_IDS.PROVIDER_SUMMARY,
+      {
+        $where: `tech='all'`,
+        $select: 'hoconum',
+        $order: 'hoconum ASC',
+        $limit: DEFAULT_LIMIT,
+      },
+      ctx,
+      MAX_LIMIT,
+    );
 
-    const rows = await this.fetchJson<RawProviderRow>(url, ctx);
-    return rows
-      .filter((r) => r.hoconum && r.holdingcompanyname)
-      .map((r) => ({
-        hoconum: r.hoconum ?? '',
-        holdingCompanyName: r.holdingcompanyname ?? '',
-      }));
+    return rows.filter((r) => r.hoconum).map((r) => ({ hoconum: r.hoconum ?? '' }));
   }
 }
 

@@ -89,6 +89,25 @@ describe('findUnderservedTool', () => {
     expect(result.notice).toBeDefined();
   });
 
+  it('forwards state abbreviation as FIPS prefix to service', async () => {
+    const ctx = createMockContext({ errors: findUnderservedTool.errors });
+    const input = findUnderservedTool.input.parse({
+      geography_type: 'county',
+      state: 'WA',
+    });
+    await findUnderservedTool.handler(input, ctx);
+    const callArgs = mockGetAreaStatsByType.mock.calls[0][0] as Record<string, unknown>;
+    expect(callArgs).toHaveProperty('stateFipsPrefix', '53');
+  });
+
+  it('does not set stateFipsPrefix when state is omitted', async () => {
+    const ctx = createMockContext({ errors: findUnderservedTool.errors });
+    const input = findUnderservedTool.input.parse({ geography_type: 'county' });
+    await findUnderservedTool.handler(input, ctx);
+    const callArgs = mockGetAreaStatsByType.mock.calls[0][0] as Record<string, unknown>;
+    expect(callArgs.stateFipsPrefix).toBeUndefined();
+  });
+
   it('formats output with rank, unserved, and oneProvider columns', () => {
     const output = {
       areas: [

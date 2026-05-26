@@ -9,8 +9,9 @@ import { getOpenDataService } from '@/services/open-data/open-data-service.js';
 export const providersListResource = resource('fcc-broadband://providers/list', {
   name: 'fcc-broadband-providers-list',
   description:
-    'List of all Form 477 holding companies with hoconum identifiers and names, derived from the deployment table. ' +
-    'Reference for resolving hoconum before calling fcc_get_provider. ' +
+    'Complete list of all Form 477 holding company numbers (hoconum) from the provider summary table. ' +
+    'Use as a directory of valid hoconum identifiers before calling fcc_get_provider. ' +
+    'Names are not included — use fcc_search_providers to resolve a company name to its hoconum. ' +
     'Data is as of June 2021.',
   mimeType: 'application/json',
   params: z.object({}),
@@ -20,13 +21,13 @@ export const providersListResource = resource('fcc-broadband://providers/list', 
         z
           .object({
             hoconum: z.string().describe('Holding company number.'),
-            holdingCompanyName: z.string().describe('Holding company name.'),
           })
           .describe('A holding company entry.'),
       )
-      .describe('All distinct holding companies in Form 477 data.'),
+      .describe('All distinct holding company numbers in Form 477 data.'),
     count: z.number().describe('Total number of holding companies.'),
     dataVintage: z.string().describe('Data vintage.'),
+    notice: z.string().describe('Usage note for resolving names.'),
   }),
 
   async handler(_params, ctx) {
@@ -37,6 +38,7 @@ export const providersListResource = resource('fcc-broadband://providers/list', 
       providers,
       count: providers.length,
       dataVintage: 'June 2021 (last Form 477 filing period)',
+      notice: 'Use fcc_search_providers with a name fragment to resolve hoconum → company name.',
     };
   },
 });
