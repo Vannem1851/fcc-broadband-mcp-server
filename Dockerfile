@@ -37,9 +37,10 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
 # OCI image metadata (https://github.com/opencontainers/image-spec/blob/main/annotations.md)
-LABEL org.opencontainers.image.title="fcc-broadband-mcp-server"
-LABEL org.opencontainers.image.description=""
+LABEL org.opencontainers.image.title="@cyanheads/fcc-broadband-mcp-server"
+LABEL org.opencontainers.image.description="Access FCC broadband availability, coverage analysis, and digital divide data for US geographies and census blocks via MCP."
 LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.source="https://github.com/cyanheads/fcc-broadband-mcp-server"
 
 # Copy dependency manifests
 COPY package.json bun.lock ./
