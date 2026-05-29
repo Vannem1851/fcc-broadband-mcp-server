@@ -19,6 +19,7 @@ await createApp({
   tools: [...allToolDefinitions],
   resources: [...allResourceDefinitions],
   prompts: [...allPromptDefinitions],
+  landing: { requireAuth: false },
   instructions:
     'FCC broadband data server providing access to Form 477 (2015–2021) and BDC (2022+) datasets.\n' +
     '- Start with fcc_geocode_block to convert coordinates to census block FIPS for address-level queries\n' +

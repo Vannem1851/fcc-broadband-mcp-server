@@ -66,7 +66,7 @@ describe('getCoverageSummaryTool', () => {
     const ctx = createMockContext({ errors: getCoverageSummaryTool.errors });
     const input = getCoverageSummaryTool.input.parse({ geography_type: 'state' });
     await expect(getCoverageSummaryTool.handler(input, ctx)).rejects.toMatchObject({
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       data: { reason: 'invalid_geography_combo' },
     });
   });
@@ -78,7 +78,7 @@ describe('getCoverageSummaryTool', () => {
       geography_id: '0',
     });
     await expect(getCoverageSummaryTool.handler(input, ctx)).rejects.toMatchObject({
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       data: { reason: 'invalid_geography_combo' },
     });
   });

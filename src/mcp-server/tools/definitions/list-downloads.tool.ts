@@ -92,7 +92,7 @@ export const listDownloadsTool = tool('fcc_list_downloads', {
     },
     {
       reason: 'invalid_as_of_date',
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       when: 'The as_of_date is not a valid BDC filing period.',
       recovery:
         'Call fcc_list_filing_periods with include_bdc=true to get valid BDC as-of dates (semi-annual, starting June 2022).',

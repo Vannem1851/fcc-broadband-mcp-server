@@ -4,7 +4,7 @@
  */
 
 import { resource, z } from '@cyanheads/mcp-ts-core';
-import { invalidParams } from '@cyanheads/mcp-ts-core/errors';
+import { validationError } from '@cyanheads/mcp-ts-core/errors';
 import { getOpenDataService } from '@/services/open-data/open-data-service.js';
 
 export const geographySummaryResource = resource('fcc-broadband://geography/{type}/{id}/summary', {
@@ -64,7 +64,7 @@ export const geographySummaryResource = resource('fcc-broadband://geography/{typ
   async handler(params, ctx) {
     const validTypes = ['nation', 'state', 'county', 'cd', 'place', 'cbsa', 'tribal'];
     if (!validTypes.includes(params.type)) {
-      throw invalidParams(
+      throw validationError(
         `Invalid geography type "${params.type}". Valid types: ${validTypes.join(', ')}.`,
       );
     }

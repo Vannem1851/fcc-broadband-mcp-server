@@ -87,7 +87,7 @@ describe('compareAreasTool', () => {
       compare_all_states: true,
     });
     await expect(compareAreasTool.handler(input, ctx)).rejects.toMatchObject({
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       data: { reason: 'invalid_all_states_combo' },
     });
   });

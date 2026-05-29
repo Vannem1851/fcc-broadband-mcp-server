@@ -118,7 +118,7 @@ export const getCoverageSummaryTool = tool('fcc_get_coverage_summary', {
     },
     {
       reason: 'invalid_geography_combo',
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       when: 'geography_id is omitted for a non-nation type, or geography_type is "nation" but geography_id is provided.',
       recovery:
         'Omit geography_id for nation-level queries, or provide it for all other geography types.',

@@ -7,7 +7,7 @@
 
 import type { Context } from '@cyanheads/mcp-ts-core';
 import type { AppConfig } from '@cyanheads/mcp-ts-core/config';
-import { invalidParams, serviceUnavailable, unauthorized } from '@cyanheads/mcp-ts-core/errors';
+import { serviceUnavailable, unauthorized, validationError } from '@cyanheads/mcp-ts-core/errors';
 import type { StorageService } from '@cyanheads/mcp-ts-core/storage';
 import { httpErrorFromResponse, withRetry } from '@cyanheads/mcp-ts-core/utils';
 import type { ServerConfig } from '@/config/server-config.js';
@@ -143,7 +143,7 @@ export class BdcApiService {
     this.requireCredentials();
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(options.asOfDate)) {
-      throw invalidParams(
+      throw validationError(
         `Invalid as_of_date format "${options.asOfDate}". Expected YYYY-MM-DD (e.g., "2024-06-30").`,
         { reason: 'invalid_as_of_date', asOfDate: options.asOfDate },
       );

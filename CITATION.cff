@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: fcc-broadband-mcp-server
+abstract: "Model Context Protocol (MCP) server for FCC broadband data, providing block-level availability, coverage analysis, provider search, and digital divide metrics for US geographies."
+type: software
+authors:
+  - family-names: Hand
+    given-names: Casey
+    orcid: "https://orcid.org/0009-0009-3726-568X"
+repository-code: "https://github.com/cyanheads/fcc-broadband-mcp-server"
+license: Apache-2.0
+keywords:
+  - mcp
+  - model-context-protocol
+  - fcc
+  - broadband
+  - digital-divide
+  - telecommunications

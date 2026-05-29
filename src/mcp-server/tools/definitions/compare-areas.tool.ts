@@ -148,7 +148,7 @@ export const compareAreasTool = tool('fcc_compare_areas', {
     },
     {
       reason: 'invalid_all_states_combo',
-      code: JsonRpcErrorCode.InvalidParams,
+      code: JsonRpcErrorCode.ValidationError,
       when: 'compare_all_states=true used with geography_type other than "state".',
       recovery:
         'Set geography_type="state" when using compare_all_states=true, or provide specific geography_ids.',
