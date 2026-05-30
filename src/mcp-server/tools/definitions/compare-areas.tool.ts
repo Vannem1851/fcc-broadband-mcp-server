@@ -138,6 +138,32 @@ export const compareAreasTool = tool('fcc_compare_areas', {
     dataVintage: z.string().describe('Data vintage — Form 477 data as of June 2021.'),
   }),
 
+  // Agent-facing success-path context: applied filter echo.
+  enrichment: {
+    appliedFilters: z
+      .object({
+        geographyType: z.string().describe('Geographic level compared.'),
+        techFilter: z.string().describe('Technology filter applied.'),
+        speedDownMbps: z.number().describe('Download speed threshold in Mbps.'),
+        sortBy: z.string().describe('Field used for ranking.'),
+        areasCompared: z.number().describe('Total number of geographies compared.'),
+      })
+      .describe('Filters and parameters applied to this comparison.'),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) =>
+        [
+          `- **Geography:** ${filters.geographyType}`,
+          `- **Tech filter:** ${filters.techFilter}`,
+          `- **Speed threshold:** ${filters.speedDownMbps} Mbps`,
+          `- **Sorted by:** ${filters.sortBy}`,
+          `- **Areas compared:** ${filters.areasCompared}`,
+        ].join('\n'),
+    },
+  },
+
   errors: [
     {
       reason: 'no_data_found',
@@ -238,6 +264,16 @@ export const compareAreasTool = tool('fcc_compare_areas', {
     ctx.log.info('fcc_compare_areas succeeded', {
       areasCompared: areas.length,
       sortBy: input.sort_by,
+    });
+
+    ctx.enrich({
+      appliedFilters: {
+        geographyType: input.geography_type,
+        techFilter: input.tech_filter,
+        speedDownMbps: parseFloat(input.speed_down),
+        sortBy: input.sort_by,
+        areasCompared: areas.length,
+      },
     });
 
     return {

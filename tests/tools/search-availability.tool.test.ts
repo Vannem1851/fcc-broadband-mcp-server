@@ -4,7 +4,7 @@
  */
 
 import { JsonRpcErrorCode } from '@cyanheads/mcp-ts-core/errors';
-import { createMockContext } from '@cyanheads/mcp-ts-core/testing';
+import { createMockContext, getEnrichment } from '@cyanheads/mcp-ts-core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { searchAvailabilityTool } from '@/mcp-server/tools/definitions/search-availability.tool.js';
 
@@ -43,6 +43,10 @@ describe('searchAvailabilityTool', () => {
     expect(result.providers[0].hoconum).toBe('130152');
     expect(result.providers[0].techLabel).toBe('Cable modem (DOCSIS 3.0)');
     expect(result.totalProviders).toBe(1);
+    // enrichment
+    const enrichment = getEnrichment(ctx);
+    expect(enrichment.appliedFilters).toBeDefined();
+    expect(enrichment.notice).toBeUndefined();
   });
 
   it('passes tech filter and min speed to service', async () => {
@@ -83,6 +87,20 @@ describe('searchAvailabilityTool', () => {
     const result = await searchAvailabilityTool.handler(input, ctx);
     expect(result.providers).toHaveLength(2);
     expect(result.totalProviders).toBe(1); // same hoconum/holding company
+  });
+
+  it('sets notice in enrichment when no providers match filters', async () => {
+    mockGetDeploymentByBlock.mockResolvedValue([]);
+    const ctx = createMockContext({ errors: searchAvailabilityTool.errors });
+    const input = searchAvailabilityTool.input.parse({
+      block_fips: '530330081021016',
+      tech_filter: ['50'],
+    });
+    const result = await searchAvailabilityTool.handler(input, ctx);
+    expect(result.providers).toHaveLength(0);
+    const enrichment = getEnrichment(ctx);
+    expect(enrichment.notice).toBeDefined();
+    expect(enrichment.notice).toContain('530330081021016');
   });
 
   it('propagates NotFound when service throws block_not_found', async () => {

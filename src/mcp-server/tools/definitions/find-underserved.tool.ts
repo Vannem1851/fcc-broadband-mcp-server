@@ -141,15 +141,53 @@ export const findUnderservedTool = tool('fcc_find_underserved', {
           .describe('An underserved area ranked by unserved population.'),
       )
       .describe('Ranked list of underserved areas.'),
-    totalFound: z
-      .number()
-      .describe('Total number of areas found before applying the limit filter.'),
     geographyType: z.string().describe('Geography type returned.'),
     speedDownMbps: z.number().describe('Speed threshold used in Mbps.'),
     urbanRuralFilter: z.string().describe('Urban/rural filter applied.'),
     dataVintage: z.string().describe('Data vintage — Form 477 data as of June 2021.'),
-    notice: z.string().optional().describe('Recovery hint when no areas are found.'),
   }),
+
+  // Agent-facing success-path context: result count, applied filter echo, and empty-result notice.
+  enrichment: {
+    totalFound: z
+      .number()
+      .describe('Total number of areas found before applying the limit filter.'),
+    appliedFilters: z
+      .object({
+        state: z
+          .string()
+          .optional()
+          .describe('State abbreviation filter applied. Absent for nationwide searches.'),
+        geographyType: z.string().describe('Geographic granularity queried.'),
+        speedDownMbps: z.number().describe('Download speed threshold in Mbps.'),
+        techFilter: z.string().describe('Technology filter applied.'),
+        urbanRuralFilter: z.string().describe('Urban/rural filter applied.'),
+        minUnservedPop: z.number().describe('Minimum unserved population filter applied.'),
+      })
+      .describe('Filters applied to this query.'),
+    notice: z
+      .string()
+      .optional()
+      .describe(
+        'Recovery hint when no areas are found — suggests how to broaden the filters. Absent on successful results.',
+      ),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) => {
+        const lines = [
+          `- **Geography:** ${filters.geographyType}`,
+          `- **Speed threshold:** ${filters.speedDownMbps} Mbps`,
+          `- **Tech filter:** ${filters.techFilter}`,
+          `- **Area filter:** ${filters.urbanRuralFilter}`,
+          `- **Min unserved pop:** ${filters.minUnservedPop}`,
+        ];
+        if (filters.state) lines.unshift(`- **State:** ${filters.state}`);
+        return `**Applied Filters:**\n${lines.join('\n')}`;
+      },
+    },
+  },
 
   errors: [
     {
@@ -191,15 +229,26 @@ export const findUnderservedTool = tool('fcc_find_underserved', {
     const totalFound = filtered.length;
     const limited = filtered.slice(0, input.limit);
 
+    const appliedFilters = {
+      ...(input.state && { state: input.state }),
+      geographyType: input.geography_type,
+      speedDownMbps: parseFloat(input.speed_down),
+      techFilter: input.tech_filter,
+      urbanRuralFilter: input.urban_rural_filter,
+      minUnservedPop: input.min_unserved_pop,
+    };
+    ctx.enrich({ totalFound, appliedFilters });
+
     if (limited.length === 0) {
+      ctx.enrich.notice(
+        `No areas found with the current filters. Try lowering min_unserved_pop or setting urban_rural_filter to "all".`,
+      );
       return {
         areas: [],
-        totalFound: 0,
         geographyType: input.geography_type,
         speedDownMbps: parseFloat(input.speed_down),
         urbanRuralFilter: input.urban_rural_filter,
         dataVintage: 'June 2021 (last Form 477 filing period)',
-        notice: `No areas found with the current filters. Try lowering min_unserved_pop or setting urban_rural_filter to "all".`,
       };
     }
 
@@ -224,7 +273,6 @@ export const findUnderservedTool = tool('fcc_find_underserved', {
 
     return {
       areas,
-      totalFound,
       geographyType: input.geography_type,
       speedDownMbps: parseFloat(input.speed_down),
       urbanRuralFilter: input.urban_rural_filter,
@@ -239,12 +287,8 @@ export const findUnderservedTool = tool('fcc_find_underserved', {
     const lines = [
       `## Underserved Areas — ${result.geographyType} level`,
       `**Speed Threshold:** ${result.speedDownMbps} Mbps | **Area Filter:** ${urLabel} (${result.urbanRuralFilter}) | **Data Vintage:** ${result.dataVintage}`,
-      `**Total Matching Areas:** ${result.totalFound} | **Shown:** ${result.areas.length}`,
+      `**Shown:** ${result.areas.length}`,
     ];
-
-    if (result.notice) {
-      lines.push(`\n> ${result.notice}`);
-    }
 
     if (result.areas.length === 0) {
       lines.push('\nNo underserved areas found with current filters.');

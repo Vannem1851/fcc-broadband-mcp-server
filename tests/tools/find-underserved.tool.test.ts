@@ -3,7 +3,7 @@
  * @module tests/tools/find-underserved.tool.test
  */
 
-import { createMockContext } from '@cyanheads/mcp-ts-core/testing';
+import { createMockContext, getEnrichment } from '@cyanheads/mcp-ts-core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { findUnderservedTool } from '@/mcp-server/tools/definitions/find-underserved.tool.js';
 
@@ -53,7 +53,7 @@ describe('findUnderservedTool', () => {
     expect(result.areas[0].id).toBe('28049');
     expect(result.areas[0].rank).toBe(1);
     expect(result.areas[0].noCoverage).toBe(30000);
-    expect(result.totalFound).toBe(3);
+    expect(getEnrichment(ctx).totalFound).toBe(3);
   });
 
   it('filters by min_unserved_pop', async () => {
@@ -75,10 +75,10 @@ describe('findUnderservedTool', () => {
     });
     const result = await findUnderservedTool.handler(input, ctx);
     expect(result.areas).toHaveLength(1);
-    expect(result.totalFound).toBe(3);
+    expect(getEnrichment(ctx).totalFound).toBe(3);
   });
 
-  it('returns empty areas with notice when no data after filter', async () => {
+  it('returns empty areas with notice in enrichment when no data after filter', async () => {
     const ctx = createMockContext({ errors: findUnderservedTool.errors });
     const input = findUnderservedTool.input.parse({
       geography_type: 'county',
@@ -86,7 +86,7 @@ describe('findUnderservedTool', () => {
     });
     const result = await findUnderservedTool.handler(input, ctx);
     expect(result.areas).toHaveLength(0);
-    expect(result.notice).toBeDefined();
+    expect(getEnrichment(ctx).notice).toBeDefined();
   });
 
   it('forwards state abbreviation as FIPS prefix to service', async () => {

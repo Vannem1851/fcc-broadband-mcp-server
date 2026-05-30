@@ -108,6 +108,36 @@ export const getCoverageSummaryTool = tool('fcc_get_coverage_summary', {
     dataVintage: z.string().describe('Data vintage — Form 477 data as of June 2021.'),
   }),
 
+  // Agent-facing success-path context: applied filter echo.
+  // Reaches both structuredContent and content[] trailer without a format() entry.
+  enrichment: {
+    appliedFilters: z
+      .object({
+        geographyType: z.string().describe('Geographic aggregation level queried.'),
+        geographyId: z.string().optional().describe('FIPS GEOID queried. Absent for nation-level.'),
+        techFilter: z.string().describe('Technology filter applied.'),
+        speedDownMbps: z.number().describe('Download speed threshold in Mbps.'),
+        urbanRuralFilter: z.string().describe('Urban/rural filter applied.'),
+        tribalFilter: z.string().describe('Tribal/non-tribal filter applied.'),
+      })
+      .describe('Filters applied to this query.'),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) => {
+        const lines = [
+          `- **Geography:** ${filters.geographyType}${filters.geographyId ? ` ${filters.geographyId}` : ''}`,
+          `- **Tech filter:** ${filters.techFilter}`,
+          `- **Speed threshold:** ${filters.speedDownMbps} Mbps`,
+          `- **Area filter:** ${filters.urbanRuralFilter}`,
+          `- **Tribal filter:** ${filters.tribalFilter}`,
+        ];
+        return `**Applied Filters:**\n${lines.join('\n')}`;
+      },
+    },
+  },
+
   errors: [
     {
       reason: 'geography_not_found',
@@ -191,6 +221,17 @@ export const getCoverageSummaryTool = tool('fcc_get_coverage_summary', {
       id: geographyId,
       totalPop,
       unservedPct: unservedPct.toFixed(1),
+    });
+
+    ctx.enrich({
+      appliedFilters: {
+        geographyType: input.geography_type,
+        ...(input.geography_id !== undefined && { geographyId: input.geography_id }),
+        techFilter: input.tech_filter,
+        speedDownMbps: parseFloat(input.speed_down),
+        urbanRuralFilter: input.urban_rural_filter,
+        tribalFilter: input.tribal_filter,
+      },
     });
 
     return {

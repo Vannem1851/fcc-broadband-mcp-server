@@ -3,7 +3,7 @@
  * @module tests/tools/search-providers.tool.test
  */
 
-import { createMockContext } from '@cyanheads/mcp-ts-core/testing';
+import { createMockContext, getEnrichment } from '@cyanheads/mcp-ts-core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { searchProvidersTool } from '@/mcp-server/tools/definitions/search-providers.tool.js';
 
@@ -37,7 +37,7 @@ describe('searchProvidersTool', () => {
     expect(result.totalFound).toBe(1);
   });
 
-  it('returns empty result with notice when no providers found', async () => {
+  it('returns empty result with notice in enrichment when no providers found', async () => {
     mockSearchProviders.mockResolvedValue([]);
     const ctx = createMockContext();
     const input = searchProvidersTool.input.parse({
@@ -47,8 +47,9 @@ describe('searchProvidersTool', () => {
     const result = await searchProvidersTool.handler(input, ctx);
     expect(result.providers).toHaveLength(0);
     expect(result.totalFound).toBe(0);
-    expect(result.notice).toBeDefined();
-    expect(result.notice).toContain('NonexistentISP');
+    const enrichment = getEnrichment(ctx);
+    expect(enrichment.notice).toBeDefined();
+    expect(enrichment.notice).toContain('NonexistentISP');
   });
 
   it('omits optional params from service call when not provided', async () => {
@@ -95,15 +96,14 @@ describe('searchProvidersTool', () => {
     expect(text).toContain('1');
   });
 
-  it('formats notice in output when present', () => {
+  it('formats empty provider list with fallback text', () => {
     const output = {
       providers: [],
       totalFound: 0,
       dataVintage: 'June 2021 (last Form 477 filing period)',
-      notice: 'No providers matched.',
     };
     const blocks = searchProvidersTool.format!(output);
     const text = (blocks[0] as { text: string }).text;
-    expect(text).toContain('No providers matched.');
+    expect(text).toContain('No providers matched the search criteria.');
   });
 });

@@ -82,6 +82,54 @@ export const listDownloadsTool = tool('fcc_list_downloads', {
     dataType: z.string().describe('Data type queried (availability or challenge).'),
   }),
 
+  // Agent-facing success-path context: applied filter echo and empty-result notice.
+  enrichment: {
+    appliedFilters: z
+      .object({
+        asOfDate: z.string().describe('As-of date queried.'),
+        dataType: z.string().describe('Data type queried.'),
+        category: z
+          .string()
+          .optional()
+          .describe('Category filter applied. Absent when not filtered.'),
+        technologyType: z
+          .string()
+          .optional()
+          .describe('Technology type filter applied. Absent when not filtered.'),
+        state: z
+          .string()
+          .optional()
+          .describe('State filter applied. Absent for all-state results.'),
+        providerName: z
+          .string()
+          .optional()
+          .describe('Provider name filter applied. Absent when not filtered.'),
+      })
+      .describe('Filters applied to this query.'),
+    notice: z
+      .string()
+      .optional()
+      .describe(
+        'Recovery hint when no files are found — suggests how to broaden the search. Absent on successful results.',
+      ),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) => {
+        const lines = [
+          `- **As-of date:** ${filters.asOfDate}`,
+          `- **Data type:** ${filters.dataType}`,
+        ];
+        if (filters.category) lines.push(`- **Category:** ${filters.category}`);
+        if (filters.technologyType) lines.push(`- **Technology:** ${filters.technologyType}`);
+        if (filters.state) lines.push(`- **State:** ${filters.state}`);
+        if (filters.providerName) lines.push(`- **Provider:** "${filters.providerName}"`);
+        return `**Applied Filters:**\n${lines.join('\n')}`;
+      },
+    },
+  },
+
   errors: [
     {
       reason: 'credentials_required',
@@ -122,6 +170,21 @@ export const listDownloadsTool = tool('fcc_list_downloads', {
       fileCount: files.length,
       asOfDate: input.as_of_date,
     });
+
+    const appliedFilters = {
+      asOfDate: input.as_of_date,
+      dataType: input.data_type,
+      ...(input.category !== undefined && { category: input.category }),
+      ...(input.technology_type !== undefined && { technologyType: input.technology_type }),
+      ...(input.state !== undefined && { state: input.state }),
+      ...(input.provider_name !== undefined && { providerName: input.provider_name }),
+    };
+    ctx.enrich({ appliedFilters });
+    if (files.length === 0) {
+      ctx.enrich.notice(
+        `No files found for ${input.as_of_date} with the applied filters. Try removing category, technology, state, or provider filters, or verify the as_of_date with fcc_list_filing_periods.`,
+      );
+    }
 
     return {
       files,

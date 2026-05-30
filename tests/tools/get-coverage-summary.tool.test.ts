@@ -4,7 +4,7 @@
  */
 
 import { JsonRpcErrorCode } from '@cyanheads/mcp-ts-core/errors';
-import { createMockContext } from '@cyanheads/mcp-ts-core/testing';
+import { createMockContext, getEnrichment } from '@cyanheads/mcp-ts-core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCoverageSummaryTool } from '@/mcp-server/tools/definitions/get-coverage-summary.tool.js';
 
@@ -52,6 +52,12 @@ describe('getCoverageSummaryTool', () => {
     expect(result.geography.name).toBe('Mississippi');
     expect(result.population.total).toBe(100000);
     expect(result.unservedPct).toBe(50);
+    // enrichment
+    const enrichment = getEnrichment(ctx);
+    expect(enrichment.appliedFilters).toBeDefined();
+    expect(enrichment.appliedFilters.geographyType).toBe('state');
+    expect(enrichment.appliedFilters.geographyId).toBe('28');
+    expect(enrichment.appliedFilters.speedDownMbps).toBe(25);
   });
 
   it('returns nation-level summary without geography_id', async () => {

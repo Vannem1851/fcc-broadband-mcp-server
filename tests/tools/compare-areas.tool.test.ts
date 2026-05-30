@@ -4,7 +4,7 @@
  */
 
 import { JsonRpcErrorCode } from '@cyanheads/mcp-ts-core/errors';
-import { createMockContext } from '@cyanheads/mcp-ts-core/testing';
+import { createMockContext, getEnrichment } from '@cyanheads/mcp-ts-core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { compareAreasTool } from '@/mcp-server/tools/definitions/compare-areas.tool.js';
 
@@ -56,6 +56,10 @@ describe('compareAreasTool', () => {
     // sorted by unserved_pct descending — 28 has higher unserved%
     expect(result.areas[0].id).toBe('28');
     expect(result.areas[0].rank).toBe(1);
+    // enrichment
+    const enrichment = getEnrichment(ctx);
+    expect(enrichment.appliedFilters).toBeDefined();
+    expect(enrichment.appliedFilters.areasCompared).toBe(2);
   });
 
   it('uses all 50 states when compare_all_states=true', async () => {

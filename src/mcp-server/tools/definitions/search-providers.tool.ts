@@ -69,11 +69,48 @@ export const searchProvidersTool = tool('fcc_search_providers', {
       .describe('Matching providers, deduplicated by holding company.'),
     totalFound: z.number().describe('Number of distinct providers returned.'),
     dataVintage: z.string().describe('Data vintage — Form 477 data as of June 2021.'),
+  }),
+
+  // Agent-facing success-path context: applied filter echo and empty-result notice.
+  enrichment: {
+    appliedFilters: z
+      .object({
+        nameSearch: z
+          .string()
+          .optional()
+          .describe('Name fragment searched. Absent when no name search was used.'),
+        state: z
+          .string()
+          .optional()
+          .describe('State filter applied. Absent for nationwide searches.'),
+        techFilter: z
+          .array(z.string())
+          .optional()
+          .describe('Technology code filter applied. Absent when no tech filter was used.'),
+      })
+      .describe('Filters applied to this query.'),
     notice: z
       .string()
       .optional()
-      .describe('Recovery hint when results are empty — suggests how to broaden the search.'),
-  }),
+      .describe(
+        'Recovery hint when no providers are found — suggests how to broaden the search. Absent on successful results.',
+      ),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) => {
+        const lines: string[] = [];
+        if (filters.nameSearch) lines.push(`- **Name search:** "${filters.nameSearch}"`);
+        if (filters.state) lines.push(`- **State:** ${filters.state}`);
+        if (filters.techFilter?.length)
+          lines.push(`- **Tech filter:** ${filters.techFilter.join(', ')}`);
+        return lines.length > 0
+          ? `**Applied Filters:**\n${lines.join('\n')}`
+          : '**Applied Filters:** none';
+      },
+    },
+  },
 
   errors: [
     {
@@ -105,6 +142,13 @@ export const searchProvidersTool = tool('fcc_search_providers', {
 
     ctx.log.info('fcc_search_providers succeeded', { count: providers.length });
 
+    const appliedFilters = {
+      ...(input.name_search !== undefined && { nameSearch: input.name_search }),
+      ...(input.state !== undefined && { state: input.state }),
+      ...(input.tech_filter?.length && { techFilter: input.tech_filter }),
+    };
+    ctx.enrich({ appliedFilters });
+
     if (providers.length === 0) {
       const criteria = [
         input.name_search && `name="${input.name_search}"`,
@@ -113,12 +157,13 @@ export const searchProvidersTool = tool('fcc_search_providers', {
       ]
         .filter(Boolean)
         .join(', ');
-
+      ctx.enrich.notice(
+        `No providers matched ${criteria}. Try a shorter name fragment or remove filters.`,
+      );
       return {
         providers: [],
         totalFound: 0,
         dataVintage: 'June 2021 (last Form 477 filing period)',
-        notice: `No providers matched ${criteria}. Try a shorter name fragment or remove filters.`,
       };
     }
 
@@ -134,10 +179,6 @@ export const searchProvidersTool = tool('fcc_search_providers', {
       `## Broadband Providers`,
       `**Data Vintage:** ${result.dataVintage} | **Found:** ${result.totalFound}`,
     ];
-
-    if (result.notice) {
-      lines.push(`\n> ${result.notice}`);
-    }
 
     if (result.providers.length === 0) {
       lines.push('\nNo providers matched the search criteria.');

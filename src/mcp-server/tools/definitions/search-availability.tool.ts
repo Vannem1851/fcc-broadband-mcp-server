@@ -84,6 +84,56 @@ export const searchAvailabilityTool = tool('fcc_search_availability', {
       ),
   }),
 
+  // Agent-facing success-path context: applied filter echo and empty-result notice.
+  // Reaches both structuredContent and content[] trailer without a format() entry.
+  enrichment: {
+    appliedFilters: z
+      .object({
+        techFilter: z
+          .array(z.string())
+          .optional()
+          .describe('Technology codes applied as a filter. Absent when no tech filter was used.'),
+        minSpeedDown: z
+          .number()
+          .optional()
+          .describe(
+            'Minimum advertised download speed filter in Mbps. Absent when no speed filter was used.',
+          ),
+        consumerFilter: z
+          .boolean()
+          .optional()
+          .describe(
+            'Consumer/business filter applied. true = consumer only, false = business only. Absent when both were returned.',
+          ),
+      })
+      .describe('Filters applied to this query.'),
+    notice: z
+      .string()
+      .optional()
+      .describe(
+        'Recovery hint when no providers are found — suggests how to broaden the query. Absent on successful results.',
+      ),
+  },
+
+  enrichmentTrailer: {
+    appliedFilters: {
+      render: (filters) => {
+        const lines: string[] = [];
+        if (filters.techFilter?.length)
+          lines.push(`- **Tech filter:** ${filters.techFilter.join(', ')}`);
+        if (filters.minSpeedDown !== undefined)
+          lines.push(`- **Min speed:** ${filters.minSpeedDown} Mbps down`);
+        if (filters.consumerFilter !== undefined)
+          lines.push(
+            `- **Service type:** ${filters.consumerFilter ? 'Consumer only' : 'Business only'}`,
+          );
+        return lines.length > 0
+          ? `**Applied Filters:**\n${lines.join('\n')}`
+          : '**Applied Filters:** none';
+      },
+    },
+  },
+
   errors: [
     {
       reason: 'block_not_found',
@@ -129,6 +179,18 @@ export const searchAvailabilityTool = tool('fcc_search_availability', {
       recordCount: records.length,
       distinctHolcos: holdingCompanyNames.size,
     });
+
+    const appliedFilters = {
+      ...(input.tech_filter?.length && { techFilter: input.tech_filter }),
+      ...(input.min_speed_down !== undefined && { minSpeedDown: input.min_speed_down }),
+      ...(input.consumer !== undefined && { consumerFilter: input.consumer }),
+    };
+    ctx.enrich({ appliedFilters });
+    if (providers.length === 0) {
+      ctx.enrich.notice(
+        `No providers found for block ${input.block_fips} with the current filters. Try removing tech or speed filters, or verify the FIPS code with fcc_geocode_block.`,
+      );
+    }
 
     return {
       blockFips: input.block_fips,
